@@ -2,13 +2,13 @@
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-    "target": "ES6",
+    "target": "ES6", // You might consider "es2017" or newer if all your deps support it, but ES6 is fine.
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "bundler", // "bundler" is modern and good. "node" is an older alternative.
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",

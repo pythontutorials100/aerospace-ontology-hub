@@ -1,3 +1,5 @@
+// app/domain-ontologies/[slug]/page.tsx
+
 import Link from "next/link"
 import { ArrowLeft, Download, ExternalLink, FileText, BookOpen, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -5,16 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-interface OntologyPageProps {
-  params: {
-    slug: string
-  }
-}
-
-export default function OntologyPage({ params }: OntologyPageProps) {
-  // In a real application, this would fetch data from your Strapi CMS and MOBI API
-  // For this example, we'll use hardcoded data
-  const ontology = {
+// --- Data for Domain Ontologies ---
+// IMPORTANT: Populate this array with ALL your domain ontology details.
+// This data will be used by generateStaticParams and to render individual pages.
+const domainOntologiesData = [
+  {
+    slug: "aerospace-components", // This must match the slug in your links and URLs
     title: "Aerospace Components Ontology",
     description: "Standardized vocabulary for aerospace structural components.",
     longDescription:
@@ -37,28 +35,12 @@ export default function OntologyPage({ params }: OntologyPageProps) {
       {
         title: "Component Classification",
         description: "Example of how to classify a structural component using the ontology",
-        code: `# Example in Turtle format
-@prefix aco: <https://example.com/ontologies/aerospace-components#> .
-@prefix ex: <https://example.com/instances/> .
-
-ex:Component123 a aco:StructuralComponent ;
-  aco:hasDesignation "Wing Rib Assembly" ;
-  aco:hasPartNumber "WR-7890-A" ;
-  aco:hasMaterial ex:Aluminum7075 ;
-  aco:isPartOf ex:WingAssembly456 .`,
+        code: `# Example in Turtle format...`, // Keep your code example
       },
       {
         title: "Component Relationships",
         description: "Example of how to model relationships between components",
-        code: `# Example in Turtle format
-@prefix aco: <https://example.com/ontologies/aerospace-components#> .
-@prefix ex: <https://example.com/instances/> .
-
-ex:WingAssembly456 a aco:Assembly ;
-  aco:hasDesignation "Main Wing Assembly" ;
-  aco:hasComponent ex:Component123 ;
-  aco:hasComponent ex:Component124 ;
-  aco:hasComponent ex:Component125 .`,
+        code: `# Example in Turtle format...`, // Keep your code example
       },
     ],
     relatedProjects: [
@@ -67,18 +49,86 @@ ex:WingAssembly456 a aco:Assembly ;
       { name: "Structural Analysis Automation", slug: "structural-analysis-automation" },
     ],
     relatedResources: [
-      {
-        type: "article",
-        title: "Introduction to the Aerospace Components Ontology",
-        slug: "intro-aerospace-components",
-      },
+      { type: "article", title: "Introduction to the Aerospace Components Ontology", slug: "intro-aerospace-components" },
       { type: "tutorial", title: "Modeling Structural Components with ACO", slug: "modeling-with-aco" },
-      {
-        type: "article",
-        title: "Best Practices for Component Classification",
-        slug: "component-classification-best-practices",
-      },
+      { type: "article", title: "Best Practices for Component Classification", slug: "component-classification-best-practices" },
     ],
+  },
+  {
+    slug: "propulsion-systems",
+    title: "Propulsion Systems Ontology",
+    description: "Comprehensive model of propulsion systems and their relationships.",
+    longDescription: "Detailed information about the Propulsion Systems Ontology...",
+    status: "Recommended",
+    version: "1.5",
+    domain: "Propulsion",
+    lastUpdated: "April 1, 2025",
+    maintainer: "Propulsion Team",
+    iri: "https://example.com/ontologies/propulsion-systems",
+    license: "Company Internal",
+    dependencies: [ { name: "Basic Formal Ontology (BFO)", version: "2.0", slug: "bfo" }],
+    usageGuidelines: "Guidelines for using the Propulsion Systems Ontology...",
+    examples: [],
+    relatedProjects: [],
+    relatedResources: [],
+  },
+  {
+    slug: "mission-planning",
+    title: "Mission Planning Ontology",
+    description: "Concepts and relationships for aerospace mission planning.",
+    longDescription: "Detailed information about the Mission Planning Ontology...",
+    status: "Under Review",
+    version: "0.9",
+    domain: "Operations",
+    lastUpdated: "May 1, 2025",
+    maintainer: "Operations Team",
+    iri: "https://example.com/ontologies/mission-planning",
+    license: "Company Internal",
+    dependencies: [],
+    usageGuidelines: "Guidelines for Mission Planning Ontology...",
+    examples: [],
+    relatedProjects: [],
+    relatedResources: [],
+  },
+  // ... ADD ALL OTHER DOMAIN ONTOLOGIES HERE with their respective details ...
+  // Example:
+  // { slug: "avionics-systems", title: "Avionics Systems Ontology", description: "...", ... },
+  // { slug: "materials-properties", title: "Materials Properties Ontology", description: "...", ... },
+];
+
+// Function to generate static paths for Next.js build
+export async function generateStaticParams() {
+  return domainOntologiesData.map((ontology) => ({
+    slug: ontology.slug,
+  }));
+}
+
+// Helper function to find ontology data by slug
+function getOntologyBySlug(slug: string) {
+  return domainOntologiesData.find((ontology) => ontology.slug === slug);
+}
+
+interface OntologyPageProps {
+  params: {
+    slug: string
+  }
+}
+
+export default function OntologyPage({ params }: OntologyPageProps) {
+  const ontology = getOntologyBySlug(params.slug);
+
+  if (!ontology) {
+    // This case should ideally not be hit if generateStaticParams covers all valid slugs
+    // and you don't have links to non-existent slugs.
+    return (
+      <div className="container mx-auto py-12 text-center">
+        <h1 className="text-2xl font-bold">Ontology Not Found</h1>
+        <p>The requested ontology with slug "{params.slug}" could not be found.</p>
+        <Link href="/domain-ontologies">
+          <Button className="mt-4">Back to Domain Ontologies</Button>
+        </Link>
+      </div>
+    );
   }
 
   const getStatusColor = (status: string) => {
@@ -102,7 +152,7 @@ ex:WingAssembly456 a aco:Assembly ;
         <div className="container px-4 md:px-6">
           <div className="mb-8">
             <Link
-              href="/domain-ontologies"
+              href="/domain-ontologies" // Next.js Link handles basePath automatically
               className="inline-flex items-center text-sm font-medium text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
             >
               <ArrowLeft className="mr-1 h-4 w-4" />
@@ -197,7 +247,7 @@ ex:WingAssembly456 a aco:Assembly ;
                         {ontology.dependencies.map((dep, index) => (
                           <li key={index}>
                             <Link
-                              href={`/domain-ontologies/${dep.slug}`}
+                              href={`/domain-ontologies/${dep.slug}`} // Assuming dependencies are also domain ontologies for now
                               className="text-sm font-medium text-primary hover:underline"
                             >
                               {dep.name} (v{dep.version})
