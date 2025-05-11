@@ -1,15 +1,40 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-    darkMode: ["class"],
-    content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+  darkMode: ["class"],
+  content: [
+    // Using App Router primarily, so these are the most important:
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "*.{js,ts,jsx,tsx,mdx}"
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    // This one is very broad. If you don't have pages/components directly in the root,
+    // you might consider removing it or making it more specific later for better build performance.
+    // For now, it's fine.
+    "*.{js,ts,jsx,tsx,mdx}",
+    // "./pages/**/*.{js,ts,jsx,tsx,mdx}", // This is for the old Pages Router, less relevant if you only use App Router
   ],
   theme: {
-  	extend: {
+    // 👇👇👇 THIS IS THE NEW SECTION TO ADD for centering the container 👇👇👇
+    container: {
+      center: true, // This makes the .container class apply mx-auto
+      padding: {
+        DEFAULT: '1rem', // Default padding for container (e.g., p-4)
+        sm: '2rem',      // Padding for sm breakpoint and up
+        lg: '3rem',      // Padding for lg breakpoint and up (adjust as you like)
+        // You can add more breakpoints like xl if needed
+      },
+      // Optional: Define max-widths for container at different breakpoints
+      // If you omit this, Tailwind uses its default screen sizes as max-widths for the container
+      // screens: {
+      //   sm: '640px',
+      //   md: '768px',
+      //   lg: '1024px',
+      //   xl: '1280px',
+      //   '2xl': '1536px',
+      // }
+    },
+    // 👆👆👆 END OF NEW SECTION 👆👆👆
+
+  	extend: { // Your existing extend block starts here
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -89,8 +114,8 @@ const config: Config = {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out'
   		}
-  	}
-  },
+  	} // End of your existing extend block
+  }, // End of theme block
   plugins: [require("tailwindcss-animate")],
 };
 export default config;
