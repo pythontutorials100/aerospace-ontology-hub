@@ -1,0 +1,67 @@
+# .github/workflows/deploy.yml
+name: Deploy Next.js site to GitHub Pages
+
+on:
+  push:
+    branches: ["main"] # Or your default branch (e.g., master)
+  workflow_dispatch: # Allows manual triggering from the Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18" # Or "20", or your preferred Node.js version
+          # cache: 'pnpm' # No need for pnpm specific cache with setup-node v4 if using pnpm setup below
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8 # Specify your pnpm version if needed
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Next.js site
+        # If you set basePath in next.config.mjs, it will be used here automatically.
+        run: pnpm run build
+        env:
+          # If you have any build-time environment variables, you can set them here
+          # NEXT_PUBLIC_BASE_PATH: /your-repo-name # Only if you decided to control basePath via env var, not recommended with output: 'export'
+          CI: true
+
+      - name: Add .nojekyll file
+        run: touch ./out/.nojekyll # The output directory is `out` by default with `output: 'export'`
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        # This action sets up the Pages environment for the deployment.
+        # If you have custom domain, it will be configured here.
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload the 'out' directory (Next.js static export output)
+          path: ./out
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        # This action deploys the artifact to GitHub Pages.
+        # The URL will be available in the summary of the workflow run.
