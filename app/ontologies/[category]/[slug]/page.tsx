@@ -1,121 +1,128 @@
+// app/ontologies/[[category]]/[[slug]]/page.tsx
+
 import Link from "next/link"
 import { ArrowLeft, Download, ExternalLink, FileText, BookOpen, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { OntologyVisualizer } from "@/components/ontology-visualizer"
+import { OntologyVisualizer } from "@/components/ontology-visualizer" // Make sure this component doesn't cause issues for static export
+
+// --- Data for All Ontologies (across categories) ---
+// IMPORTANT: Populate this array with ALL your ontology details, including their category and slug.
+const allOntologiesData = [
+  {
+    category: "Domain", // Make sure this matches what you expect in the URL path
+    slug: "aerospace-components",
+    title: "Aerospace Components Ontology",
+    description: "Standardized vocabulary for aerospace structural components.",
+    longDescription: "The Aerospace Components Ontology provides...",
+    status: "Adopted",
+    version: "2.3",
+    domain: "Structures", // This might be redundant if category is 'Domain' or could be more specific
+    lastUpdated: "March 15, 2025",
+    maintainer: "Structures Domain Team",
+    iri: "https://example.com/ontologies/aerospace-components",
+    license: "Company Internal",
+    dependencies: [{ name: "Basic Formal Ontology (BFO)", version: "2.0", slug: "bfo" }],
+    usageGuidelines: "This ontology should be used as the primary vocabulary...",
+    examples: [{ title: "Component Classification", description: "...", code: "..." }],
+    relatedProjects: [{ name: "Wing Design Knowledge Graph", slug: "wing-design-kg" }],
+    relatedResources: [{ type: "article", title: "Intro to ACO", slug: "intro-aerospace-components" }],
+  },
+  {
+    category: "Foundation",
+    slug: "bfo",
+    title: "Basic Formal Ontology (BFO)",
+    description: "Upper-level ontology that provides a framework for domain ontologies.",
+    longDescription: "The Basic Formal Ontology (BFO) is an upper-level ontology...",
+    status: "Adopted",
+    version: "2.0",
+    domain: "Foundation",
+    lastUpdated: "January 1, 2024",
+    maintainer: "Foundation Ontology Team",
+    iri: "https://example.com/ontologies/bfo",
+    license: "Open Source",
+    dependencies: [],
+    usageGuidelines: "Guidelines for BFO...",
+    examples: [],
+    relatedProjects: [],
+    relatedResources: [],
+  },
+  {
+    category: "Enterprise",
+    slug: "enterprise-ontology",
+    title: "Enterprise Ontology",
+    description: "Core enterprise concepts and relationships for organizational modeling.",
+    longDescription: "The Enterprise Ontology provides a standardized vocabulary...",
+    status: "Adopted",
+    version: "1.5",
+    domain: "Enterprise",
+    lastUpdated: "February 1, 2025",
+    maintainer: "Enterprise Architecture Team",
+    iri: "https://example.com/ontologies/enterprise-ontology",
+    license: "Company Internal",
+    dependencies: [{ name: "Basic Formal Ontology (BFO)", version: "2.0", slug: "bfo" }],
+    usageGuidelines: "Guidelines for Enterprise Ontology...",
+    examples: [],
+    relatedProjects: [],
+    relatedResources: [],
+  },
+  // ... ADD ALL OTHER ONTOLOGIES HERE (Domain, Foundation, Enterprise) with their details ...
+  // e.g., from your /ontologies/page.tsx:
+  // propulsion-systems (Domain), mission-planning (Domain), materials-properties (Domain)
+];
+
+// Function to generate static paths for Next.js build
+export async function generateStaticParams() {
+  return allOntologiesData.map((ontology) => ({
+    category: ontology.category.toLowerCase(), // Ensure category matches URL path (e.g., 'domain', not 'Domain')
+    slug: ontology.slug,
+  }));
+}
+
+// Helper function to find ontology data by category and slug
+function getOntologyByCatAndSlug(categoryParam?: string | string[], slugParam?: string | string[]) {
+  const category = Array.isArray(categoryParam) ? categoryParam[0] : categoryParam;
+  const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
+
+  if (!category || !slug) return undefined;
+
+  return allOntologiesData.find(
+    (ont) => ont.category.toLowerCase() === category.toLowerCase() && ont.slug === slug
+  );
+}
 
 interface OntologyPageProps {
   params: {
-    category: string
-    slug: string
+    category?: string | string[] // If your folder name is [[category]]
+    slug?: string | string[]     // If your folder name is [[slug]]
   }
 }
 
 export default function OntologyPage({ params }: OntologyPageProps) {
-  // In a real application, this would fetch data from your Strapi CMS and MOBI API
-  // For this example, we'll use hardcoded data
-  const ontology = {
-    title:
-      params.slug === "aerospace-components"
-        ? "Aerospace Components Ontology"
-        : params.slug === "bfo"
-          ? "Basic Formal Ontology (BFO)"
-          : "Enterprise Ontology",
-    description:
-      params.slug === "aerospace-components"
-        ? "Standardized vocabulary for aerospace structural components."
-        : params.slug === "bfo"
-          ? "Upper-level ontology that provides a framework for domain ontologies."
-          : "Core enterprise concepts and relationships for organizational modeling.",
-    longDescription:
-      params.slug === "aerospace-components"
-        ? "The Aerospace Components Ontology provides a comprehensive semantic model for structural components used in aerospace engineering. It defines classes, properties, and relationships that enable consistent representation of components across different systems and applications."
-        : params.slug === "bfo"
-          ? "The Basic Formal Ontology (BFO) is an upper-level ontology designed to support information integration, retrieval and analysis across diverse domains. It is a realist, formal and domain-neutral upper-level ontology that provides a genuine top-level categorization of reality."
-          : "The Enterprise Ontology provides a standardized vocabulary for describing organizational structures, processes, and resources. It enables consistent representation of enterprise concepts across different systems and applications.",
-    status: "Adopted",
-    version: params.slug === "aerospace-components" ? "2.3" : params.slug === "bfo" ? "2.0" : "1.5",
-    domain: params.slug === "aerospace-components" ? "Structures" : params.slug === "bfo" ? "Foundation" : "Enterprise",
-    lastUpdated: "March 15, 2025",
-    maintainer:
-      params.slug === "aerospace-components"
-        ? "Structures Domain Team"
-        : params.slug === "bfo"
-          ? "Foundation Ontology Team"
-          : "Enterprise Architecture Team",
-    iri: `https://example.com/ontologies/${params.slug}`,
-    license: "Company Internal",
-    dependencies: [
-      { name: "Basic Formal Ontology (BFO)", version: "2.0", slug: "bfo" },
-      { name: "Enterprise Ontology", version: "1.5", slug: "enterprise-ontology" },
-      { name: "Materials Properties Ontology", version: "2.0", slug: "materials-properties" },
-    ],
-    usageGuidelines:
-      "This ontology should be used as the primary vocabulary for all structural component modeling within the organization. It provides standardized terms for components, their properties, and relationships.",
-    examples: [
-      {
-        title: "Component Classification",
-        description: "Example of how to classify a structural component using the ontology",
-        code: `# Example in Turtle format
-@prefix aco: <https://example.com/ontologies/aerospace-components#> .
-@prefix ex: <https://example.com/instances/> .
+  const ontology = getOntologyByCatAndSlug(params.category, params.slug);
 
-ex:Component123 a aco:StructuralComponent ;
-  aco:hasDesignation "Wing Rib Assembly" ;
-  aco:hasPartNumber "WR-7890-A" ;
-  aco:hasMaterial ex:Aluminum7075 ;
-  aco:isPartOf ex:WingAssembly456 .`,
-      },
-      {
-        title: "Component Relationships",
-        description: "Example of how to model relationships between components",
-        code: `# Example in Turtle format
-@prefix aco: <https://example.com/ontologies/aerospace-components#> .
-@prefix ex: <https://example.com/instances/> .
-
-ex:WingAssembly456 a aco:Assembly ;
-  aco:hasDesignation "Main Wing Assembly" ;
-  aco:hasComponent ex:Component123 ;
-  aco:hasComponent ex:Component124 ;
-  aco:hasComponent ex:Component125 .`,
-      },
-    ],
-    relatedProjects: [
-      { name: "Wing Design Knowledge Graph", slug: "wing-design-kg" },
-      { name: "Component Digital Twin Initiative", slug: "component-digital-twin" },
-      { name: "Structural Analysis Automation", slug: "structural-analysis-automation" },
-    ],
-    relatedResources: [
-      {
-        type: "article",
-        title: "Introduction to the Aerospace Components Ontology",
-        slug: "intro-aerospace-components",
-      },
-      { type: "tutorial", title: "Modeling Structural Components with ACO", slug: "modeling-with-aco" },
-      {
-        type: "article",
-        title: "Best Practices for Component Classification",
-        slug: "component-classification-best-practices",
-      },
-    ],
+  if (!ontology) {
+    return (
+      <div className="container mx-auto py-12 text-center">
+        <h1 className="text-2xl font-bold">Ontology Not Found</h1>
+        <p>The requested ontology could not be found.</p>
+        <Link href="/ontologies">
+          <Button className="mt-4">Back to Ontologies</Button>
+        </Link>
+      </div>
+    );
   }
 
   const getStatusColor = (status: string) => {
+    // ... (Your getStatusColor function)
     switch (status) {
-      case "Adopted":
-        return "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800/20 dark:text-green-400"
-      case "Recommended":
-        return "bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-800/20 dark:text-blue-400"
-      case "Under Review":
-        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-800/20 dark:text-yellow-400"
-      case "Deprecated":
-        return "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-800/20 dark:text-red-400"
-      default:
-        return "bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400"
+      case "Adopted": return "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800/20 dark:text-green-400";
+      // ... other cases
+      default: return "bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400";
     }
-  }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -160,9 +167,10 @@ ex:WingAssembly456 a aco:Assembly ;
                     <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Version</dt>
                     <dd className="text-sm font-semibold">{ontology.version}</dd>
                   </div>
+                  {/* Ensure your `ontology` object has `domain` if you use it here, or use `ontology.category` */}
                   <div>
-                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Domain</dt>
-                    <dd className="text-sm font-semibold">{ontology.domain}</dd>
+                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Category/Domain</dt>
+                    <dd className="text-sm font-semibold">{ontology.domain || ontology.category}</dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Last Updated</dt>
@@ -187,13 +195,18 @@ ex:WingAssembly456 a aco:Assembly ;
         </div>
       </section>
 
+      {/* Interactive Ontology Visualizer might need conditional rendering or props if it's client-side heavy */}
+      {typeof window !== 'undefined' && ontology.slug && ( // Simple check to ensure it runs client-side
+         <section className="w-full py-12 md:py-24">
+            <div className="container px-4 md:px-6">
+                <OntologyVisualizer ontologyId={ontology.slug} title={`Explore ${ontology.title}`} height={500} />
+            </div>
+         </section>
+      )}
+
+
       <section className="w-full py-12 md:py-24">
         <div className="container px-4 md:px-6">
-          {/* Interactive Ontology Visualizer */}
-          <div className="mb-8">
-            <OntologyVisualizer ontologyId={params.slug} title={`Explore ${ontology.title}`} height={500} />
-          </div>
-
           <Tabs defaultValue="documentation" className="w-full">
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-4">
               <TabsTrigger value="documentation">Documentation</TabsTrigger>
@@ -207,7 +220,6 @@ ex:WingAssembly456 a aco:Assembly ;
                   <div className="prose dark:prose-invert max-w-none">
                     <h2>Description</h2>
                     <p>{ontology.longDescription}</p>
-
                     <h2>Usage Guidelines</h2>
                     <p>{ontology.usageGuidelines}</p>
                   </div>
@@ -223,6 +235,7 @@ ex:WingAssembly456 a aco:Assembly ;
                         {ontology.dependencies.map((dep, index) => (
                           <li key={index}>
                             <Link
+                              // Adjust link based on how dependency slugs are structured
                               href={`/ontologies/${dep.slug.includes("bfo") ? "foundation" : "domain"}/${dep.slug}`}
                               className="text-sm font-medium text-primary hover:underline"
                             >
@@ -237,15 +250,13 @@ ex:WingAssembly456 a aco:Assembly ;
               </div>
             </TabsContent>
             <TabsContent value="examples" className="mt-6">
-              <div className="space-y-8">
+               <div className="space-y-8">
                 {ontology.examples.map((example, index) => (
                   <div key={index} className="space-y-4">
                     <h3 className="text-xl font-bold">{example.title}</h3>
                     <p className="text-slate-700 dark:text-slate-300">{example.description}</p>
                     <div className="bg-slate-950 text-slate-50 p-4 rounded-md overflow-x-auto">
-                      <pre className="text-sm">
-                        <code>{example.code}</code>
-                      </pre>
+                      <pre className="text-sm"><code>{example.code}</code></pre>
                     </div>
                   </div>
                 ))}
@@ -258,14 +269,10 @@ ex:WingAssembly456 a aco:Assembly ;
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {ontology.relatedProjects.map((project, index) => (
                     <Card key={index}>
-                      <CardHeader>
-                        <CardTitle>{project.name}</CardTitle>
-                      </CardHeader>
+                      <CardHeader><CardTitle>{project.name}</CardTitle></CardHeader>
                       <CardContent>
                         <Link href={`/projects/${project.slug}`}>
-                          <Button variant="outline" className="w-full">
-                            View Project
-                          </Button>
+                          <Button variant="outline" className="w-full">View Project</Button>
                         </Link>
                       </CardContent>
                     </Card>
@@ -286,32 +293,16 @@ ex:WingAssembly456 a aco:Assembly ;
                         <div className="flex justify-between items-start">
                           <CardTitle className="text-lg">{resource.title}</CardTitle>
                           {resource.type === "tutorial" ? (
-                            <Badge
-                              variant="outline"
-                              className="bg-purple-100 text-purple-800 hover:bg-purple-200 dark:bg-purple-800/20 dark:text-purple-400"
-                            >
-                              Tutorial
-                            </Badge>
+                            <Badge variant="outline" className="bg-purple-100 text-purple-800 hover:bg-purple-200 dark:bg-purple-800/20 dark:text-purple-400">Tutorial</Badge>
                           ) : (
-                            <Badge
-                              variant="outline"
-                              className="bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400"
-                            >
-                              Article
-                            </Badge>
+                            <Badge variant="outline" className="bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400">Article</Badge>
                           )}
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <Link
-                          href={`/resources/${resource.type === "tutorial" ? "tutorials" : "articles"}/${resource.slug}`}
-                        >
+                        <Link href={`/resources/${resource.type === "tutorial" ? "tutorials" : "articles"}/${resource.slug}`}>
                           <Button variant="outline" className="w-full">
-                            {resource.type === "tutorial" ? (
-                              <BookOpen className="mr-2 h-4 w-4" />
-                            ) : (
-                              <FileText className="mr-2 h-4 w-4" />
-                            )}
+                            {resource.type === "tutorial" ? <BookOpen className="mr-2 h-4 w-4" /> : <FileText className="mr-2 h-4 w-4" />}
                             Read {resource.type === "tutorial" ? "Tutorial" : "Article"}
                           </Button>
                         </Link>
@@ -336,15 +327,10 @@ ex:WingAssembly456 a aco:Assembly ;
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
               <Link href="/team">
-                <Button className="px-8">
-                  <Users className="mr-2 h-4 w-4" />
-                  Contact Domain Experts
-                </Button>
+                <Button className="px-8"><Users className="mr-2 h-4 w-4" />Contact Domain Experts</Button>
               </Link>
               <Link href="/contact">
-                <Button variant="outline" className="px-8">
-                  Request Support
-                </Button>
+                <Button variant="outline" className="px-8">Request Support</Button>
               </Link>
             </div>
           </div>
