@@ -1,150 +1,152 @@
-// app/domain-ontologies/[slug]/page.tsx
+// app/projects/[slug]/page.tsx
+// OR app/projects/[[slug]]/page.tsx - adjust imports if necessary based on actual path
 
 import Link from "next/link"
-import { ArrowLeft, Download, ExternalLink, FileText, BookOpen, Users } from "lucide-react"
+import { ArrowLeft, Calendar, Download, ExternalLink, FileText, Users, Activity, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Progress } from "@/components/ui/progress"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-// --- Data for Domain Ontologies ---
-// IMPORTANT: Populate this array with ALL your domain ontology details.
+// --- Data for Projects ---
+// IMPORTANT: Populate this array with ALL your project details.
 // This data will be used by generateStaticParams and to render individual pages.
-const domainOntologiesData = [
+const allProjectsData = [
   {
-    slug: "aerospace-components", // This must match the slug in your links and URLs
-    title: "Aerospace Components Ontology",
-    description: "Standardized vocabulary for aerospace structural components.",
+    slug: "wing-design-kg", // This must match the slug in your links and URLs
+    title: "Wing Design Knowledge Graph",
+    description: "Creating a comprehensive knowledge graph for wing design and analysis.",
     longDescription:
-      "The Aerospace Components Ontology provides a comprehensive semantic model for structural components used in aerospace engineering. It defines classes, properties, and relationships that enable consistent representation of components across different systems and applications.",
-    status: "Adopted",
-    version: "2.3",
-    domain: "Structures",
-    lastUpdated: "March 15, 2025",
-    maintainer: "Structures Domain Team",
-    iri: "https://example.com/ontologies/aerospace-components",
-    license: "Company Internal",
-    dependencies: [
-      { name: "Basic Formal Ontology (BFO)", version: "2.0", slug: "bfo" },
-      { name: "Enterprise Ontology", version: "1.5", slug: "enterprise-ontology" },
-      { name: "Materials Properties Ontology", version: "2.0", slug: "materials-properties" },
+      "The Wing Design Knowledge Graph project aims to create a semantic model of wing design knowledge, integrating data from multiple sources including CAD models, simulation results, test data, and design requirements. This knowledge graph will enable more efficient design processes, better traceability, and improved knowledge reuse across projects.",
+    status: "In Progress",
+    completion: 75,
+    team: "Structures Team",
+    organization: "Aerospace Engineering Division",
+    startDate: "January 15, 2025",
+    estimatedCompletion: "August 30, 2025",
+    projectLead: "Dr. Jane Smith",
+    objectives: [
+      "Create a comprehensive ontology for wing structural components",
+      "Develop automated processes for populating the knowledge graph from existing data sources",
+      "Implement query interfaces for design engineers to access relevant knowledge",
+      "Integrate with existing CAD and simulation tools",
+      "Demonstrate improved design efficiency through knowledge reuse",
     ],
-    usageGuidelines:
-      "This ontology should be used as the primary vocabulary for all structural component modeling within the organization. It provides standardized terms for components, their properties, and relationships.",
-    examples: [
-      {
-        title: "Component Classification",
-        description: "Example of how to classify a structural component using the ontology",
-        code: `# Example in Turtle format...`, // Keep your code example
-      },
-      {
-        title: "Component Relationships",
-        description: "Example of how to model relationships between components",
-        code: `# Example in Turtle format...`, // Keep your code example
-      },
+    teamMembers: [
+      { name: "Dr. Jane Smith", role: "Project Lead", image: "/placeholder.svg?height=40&width=40", slug: "jane-smith" },
+      { name: "John Doe", role: "Domain Ontology Specialist", image: "/placeholder.svg?height=40&width=40", slug: "john-doe" },
+      { name: "Sarah Johnson", role: "Knowledge Graph Engineer", image: "/placeholder.svg?height=40&width=40", slug: "sarah-johnson" },
+      { name: "Michael Chen", role: "Semantic Integration Specialist", image: "/placeholder.svg?height=40&width=40", slug: "michael-chen" },
     ],
-    relatedProjects: [
-      { name: "Wing Design Knowledge Graph", slug: "wing-design-kg" },
-      { name: "Component Digital Twin Initiative", slug: "component-digital-twin" },
-      { name: "Structural Analysis Automation", slug: "structural-analysis-automation" },
+    relatedOntologies: [
+      { name: "Aerospace Components Ontology", slug: "aerospace-components" },
+      { name: "Materials Properties Ontology", slug: "materials-properties" },
+      { name: "Engineering Analysis Ontology", slug: "engineering-analysis" },
     ],
     relatedResources: [
-      { type: "article", title: "Introduction to the Aerospace Components Ontology", slug: "intro-aerospace-components" },
-      { type: "tutorial", title: "Modeling Structural Components with ACO", slug: "modeling-with-aco" },
-      { type: "article", title: "Best Practices for Component Classification", slug: "component-classification-best-practices" },
+      { type: "article", title: "Knowledge Graphs for Aerospace Engineering", slug: "knowledge-graphs-aerospace" },
+      { type: "tutorial", title: "Building a Knowledge Graph with MOBI", slug: "knowledge-graph-mobi" },
+      { type: "article", title: "Semantic Integration of CAD and Simulation Data", slug: "semantic-integration-cad" },
+    ],
+    milestones: [
+      { title: "Requirements Analysis", description: "Define project scope and requirements", date: "January 15 - February 28, 2025", status: "Completed", completion: 100 },
+      // ... more milestones
     ],
   },
   {
-    slug: "propulsion-systems",
-    title: "Propulsion Systems Ontology",
-    description: "Comprehensive model of propulsion systems and their relationships.",
-    longDescription: "Detailed information about the Propulsion Systems Ontology...",
-    status: "Recommended",
-    version: "1.5",
-    domain: "Propulsion",
-    lastUpdated: "April 1, 2025",
-    maintainer: "Propulsion Team",
-    iri: "https://example.com/ontologies/propulsion-systems",
-    license: "Company Internal",
-    dependencies: [ { name: "Basic Formal Ontology (BFO)", version: "2.0", slug: "bfo" }],
-    usageGuidelines: "Guidelines for using the Propulsion Systems Ontology...",
-    examples: [],
-    relatedProjects: [],
-    relatedResources: [],
+    slug: "component-digital-twin",
+    title: "Component Digital Twin Initiative",
+    description: "Developing digital twins for critical aerospace components using ontology-based models.",
+    longDescription: "Detailed information about the Component Digital Twin Initiative...",
+    status: "Active",
+    completion: 40,
+    team: "Digital Engineering Team",
+    organization: "Aerospace Engineering Division",
+    startDate: "February 1, 2025",
+    estimatedCompletion: "December 31, 2025",
+    projectLead: "Michael Chen",
+    objectives: ["Objective 1 for digital twin", "Objective 2"],
+    teamMembers: [ /* ... team members ... */],
+    relatedOntologies: [ /* ... ontologies ... */],
+    relatedResources: [ /* ... resources ... */],
+    milestones: [ /* ... milestones ... */],
   },
   {
-    slug: "mission-planning",
-    title: "Mission Planning Ontology",
-    description: "Concepts and relationships for aerospace mission planning.",
-    longDescription: "Detailed information about the Mission Planning Ontology...",
-    status: "Under Review",
-    version: "0.9",
-    domain: "Operations",
-    lastUpdated: "May 1, 2025",
-    maintainer: "Operations Team",
-    iri: "https://example.com/ontologies/mission-planning",
-    license: "Company Internal",
-    dependencies: [],
-    usageGuidelines: "Guidelines for Mission Planning Ontology...",
-    examples: [],
-    relatedProjects: [],
-    relatedResources: [],
+    slug: "propulsion-ontology-dev",
+    title: "Propulsion Systems Ontology Development",
+    description: "Expanding and refining the propulsion systems ontology for broader application.",
+    longDescription: "Detailed information about Propulsion Systems Ontology Development...",
+    status: "Planning",
+    completion: 15,
+    team: "Propulsion Team",
+    organization: "Aerospace Engineering Division",
+    startDate: "March 1, 2025",
+    estimatedCompletion: "October 31, 2025",
+    projectLead: "Lisa Wong",
+    objectives: ["Objective 1 for propulsion dev", "Objective 2"],
+    teamMembers: [ /* ... team members ... */],
+    relatedOntologies: [ /* ... ontologies ... */],
+    relatedResources: [ /* ... resources ... */],
+    milestones: [ /* ... milestones ... */],
   },
-  // ... ADD ALL OTHER DOMAIN ONTOLOGIES HERE with their respective details ...
-  // Example:
-  // { slug: "avionics-systems", title: "Avionics Systems Ontology", description: "...", ... },
-  // { slug: "materials-properties", title: "Materials Properties Ontology", description: "...", ... },
+  // ... ADD ALL OTHER PROJECTS HERE with their respective details ...
 ];
 
 // Function to generate static paths for Next.js build
 export async function generateStaticParams() {
-  return domainOntologiesData.map((ontology) => ({
-    slug: ontology.slug,
+  return allProjectsData.map((project) => ({
+    // If your folder is [[slug]], params.slug will be an array.
+    // For generateStaticParams, you provide the parts of the path.
+    // If it's truly optional catch-all, you might also want a path with no slug.
+    // But if you always expect a slug, this is fine.
+    slug: project.slug,
   }));
 }
 
-// Helper function to find ontology data by slug
-function getOntologyBySlug(slug: string) {
-  return domainOntologiesData.find((ontology) => ontology.slug === slug);
+// Helper function to find project data by slug
+function getProjectBySlug(slug: string | string[] | undefined) {
+  // Adjust if slug can be an array (for [[...slug]] type routes)
+  const actualSlug = Array.isArray(slug) ? slug[0] : slug;
+  return allProjectsData.find((project) => project.slug === actualSlug);
 }
 
-interface OntologyPageProps {
+interface ProjectPageProps {
   params: {
-    slug: string
+    // If your folder is [[slug]], params.slug would be string[] | undefined
+    // If your folder is [slug], params.slug would be string
+    slug: string // Assuming it's effectively treated as a single slug for these pages
   }
 }
 
-export default function OntologyPage({ params }: OntologyPageProps) {
-  const ontology = getOntologyBySlug(params.slug);
+export default function ProjectPage({ params }: ProjectPageProps) {
+  const project = getProjectBySlug(params.slug);
 
-  if (!ontology) {
-    // This case should ideally not be hit if generateStaticParams covers all valid slugs
-    // and you don't have links to non-existent slugs.
+  if (!project) {
     return (
       <div className="container mx-auto py-12 text-center">
-        <h1 className="text-2xl font-bold">Ontology Not Found</h1>
-        <p>The requested ontology with slug "{params.slug}" could not be found.</p>
-        <Link href="/domain-ontologies">
-          <Button className="mt-4">Back to Domain Ontologies</Button>
+        <h1 className="text-2xl font-bold">Project Not Found</h1>
+        <p>The requested project with slug "{Array.isArray(params.slug) ? params.slug.join('/') : params.slug}" could not be found.</p>
+        <Link href="/projects">
+          <Button className="mt-4">Back to Projects</Button>
         </Link>
       </div>
     );
   }
 
+  // Your existing getStatusColor function can remain here or be moved to a utils file
   const getStatusColor = (status: string) => {
+    // ... (implementation as before)
     switch (status) {
-      case "Adopted":
-        return "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800/20 dark:text-green-400"
-      case "Recommended":
-        return "bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-800/20 dark:text-blue-400"
-      case "Under Review":
-        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-800/20 dark:text-yellow-400"
-      case "Deprecated":
-        return "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-800/20 dark:text-red-400"
-      default:
-        return "bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400"
+      case "Completed": return "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800/20 dark:text-green-400";
+      case "In Progress": return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-800/20 dark:text-yellow-400";
+      case "Active": return "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800/20 dark:text-green-400"; // Example, adjust as needed
+      case "Planning": return "bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-800/20 dark:text-blue-400"; // Example
+      case "Not Started": return "bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400";
+      default: return "bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400";
     }
-  }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -152,62 +154,70 @@ export default function OntologyPage({ params }: OntologyPageProps) {
         <div className="container px-4 md:px-6">
           <div className="mb-8">
             <Link
-              href="/domain-ontologies" // Next.js Link handles basePath automatically
+              href="/projects"
               className="inline-flex items-center text-sm font-medium text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
             >
               <ArrowLeft className="mr-1 h-4 w-4" />
-              Back to Domain Ontologies
+              Back to Projects
             </Link>
           </div>
           <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
             <div>
               <div className="flex items-center gap-4 mb-4">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">{ontology.title}</h1>
-                <Badge className={getStatusColor(ontology.status)} variant="outline">
-                  {ontology.status}
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">{project.title}</h1>
+                <Badge
+                  className={getStatusColor(project.status)} // Use project.status from dynamic data
+                  variant="outline"
+                >
+                  {project.status}
                 </Badge>
               </div>
-              <p className="text-xl text-slate-700 dark:text-slate-300 mb-6">{ontology.description}</p>
+              <p className="text-xl text-slate-700 dark:text-slate-300 mb-6">{project.description}</p>
               <div className="flex flex-wrap gap-4">
                 <Button>
                   <Download className="mr-2 h-4 w-4" />
-                  Download Ontology
+                  Project Documentation
                 </Button>
                 <Button variant="outline">
                   <ExternalLink className="mr-2 h-4 w-4" />
-                  View in MOBI Catalog
+                  View in Project Portal
                 </Button>
               </div>
             </div>
             <Card>
               <CardHeader>
-                <CardTitle>Ontology Details</CardTitle>
+                <CardTitle>Project Details</CardTitle>
               </CardHeader>
               <CardContent>
                 <dl className="space-y-4">
                   <div>
-                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Version</dt>
-                    <dd className="text-sm font-semibold">{ontology.version}</dd>
+                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Organization</dt>
+                    <dd className="text-sm font-semibold">{project.organization}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Domain</dt>
-                    <dd className="text-sm font-semibold">{ontology.domain}</dd>
+                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Team</dt>
+                    <dd className="text-sm font-semibold">{project.team}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Last Updated</dt>
-                    <dd className="text-sm font-semibold">{ontology.lastUpdated}</dd>
+                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Project Lead</dt>
+                    <dd className="text-sm font-semibold">{project.projectLead}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Maintainer</dt>
-                    <dd className="text-sm font-semibold">{ontology.maintainer}</dd>
+                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Start Date</dt>
+                    <dd className="text-sm font-semibold">{project.startDate}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">IRI</dt>
-                    <dd className="text-sm font-semibold break-all">{ontology.iri}</dd>
+                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Estimated Completion</dt>
+                    <dd className="text-sm font-semibold">{project.estimatedCompletion}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">License</dt>
-                    <dd className="text-sm font-semibold">{ontology.license}</dd>
+                    <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Progress</dt>
+                    <dd className="mt-1">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>{project.completion}% Complete</span>
+                      </div>
+                      <Progress value={project.completion} className="h-2" />
+                    </dd>
                   </div>
                 </dl>
               </CardContent>
@@ -216,41 +226,49 @@ export default function OntologyPage({ params }: OntologyPageProps) {
         </div>
       </section>
 
+      {/* Rest of your page using project.* properties (project.longDescription, project.objectives, etc.) */}
+      {/* Make sure to map over project.teamMembers, project.milestones, project.relatedOntologies, project.relatedResources */}
+
       <section className="w-full py-12 md:py-24">
         <div className="container px-4 md:px-6">
-          <Tabs defaultValue="documentation" className="w-full">
+          <Tabs defaultValue="overview" className="w-full">
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-4">
-              <TabsTrigger value="documentation">Documentation</TabsTrigger>
-              <TabsTrigger value="examples">Examples</TabsTrigger>
-              <TabsTrigger value="projects">Projects</TabsTrigger>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="team">Team</TabsTrigger>
+              <TabsTrigger value="milestones">Milestones</TabsTrigger>
               <TabsTrigger value="resources">Resources</TabsTrigger>
             </TabsList>
-            <TabsContent value="documentation" className="mt-6">
+            <TabsContent value="overview" className="mt-6">
               <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
                 <div className="space-y-6">
                   <div className="prose dark:prose-invert max-w-none">
-                    <h2>Description</h2>
-                    <p>{ontology.longDescription}</p>
+                    <h2>Project Description</h2>
+                    <p>{project.longDescription}</p>
 
-                    <h2>Usage Guidelines</h2>
-                    <p>{ontology.usageGuidelines}</p>
+                    <h2>Objectives</h2>
+                    <ul>
+                      {project.objectives.map((objective, index) => (
+                        <li key={index}>{objective}</li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Dependencies</CardTitle>
-                      <CardDescription>This ontology depends on the following ontologies</CardDescription>
+                      <CardTitle>Related Ontologies</CardTitle>
+                      <CardDescription>Ontologies used in this project</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-2">
-                        {ontology.dependencies.map((dep, index) => (
+                        {project.relatedOntologies.map((ontology, index) => (
                           <li key={index}>
                             <Link
-                              href={`/domain-ontologies/${dep.slug}`} // Assuming dependencies are also domain ontologies for now
+                              // Adjust this link based on where your ontology detail pages are
+                              href={`/ontologies/domain/${ontology.slug}`}
                               className="text-sm font-medium text-primary hover:underline"
                             >
-                              {dep.name} (v{dep.version})
+                              {ontology.name}
                             </Link>
                           </li>
                         ))}
@@ -260,37 +278,68 @@ export default function OntologyPage({ params }: OntologyPageProps) {
                 </div>
               </div>
             </TabsContent>
-            <TabsContent value="examples" className="mt-6">
-              <div className="space-y-8">
-                {ontology.examples.map((example, index) => (
-                  <div key={index} className="space-y-4">
-                    <h3 className="text-xl font-bold">{example.title}</h3>
-                    <p className="text-slate-700 dark:text-slate-300">{example.description}</p>
-                    <div className="bg-slate-950 text-slate-50 p-4 rounded-md overflow-x-auto">
-                      <pre className="text-sm">
-                        <code>{example.code}</code>
-                      </pre>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-            <TabsContent value="projects" className="mt-6">
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold">Related Projects</h2>
-                <p className="text-slate-700 dark:text-slate-300">Projects that use the {ontology.title}</p>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {ontology.relatedProjects.map((project, index) => (
+            <TabsContent value="team" className="mt-6">
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold">Project Team</h2>
+                <p className="text-slate-700 dark:text-slate-300">
+                  Meet the team members working on the {project.title} project.
+                </p>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                  {project.teamMembers.map((member, index) => (
                     <Card key={index}>
                       <CardHeader>
-                        <CardTitle>{project.name}</CardTitle>
+                        <div className="flex items-center gap-4">
+                          <Avatar>
+                            <AvatarImage src={member.image || "/placeholder.svg"} alt={member.name} />
+                            <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <CardTitle className="text-lg">{member.name}</CardTitle>
+                            <CardDescription>{member.role}</CardDescription>
+                          </div>
+                        </div>
                       </CardHeader>
-                      <CardContent>
-                        <Link href={`/projects/${project.slug}`}>
-                          <Button variant="outline" className="w-full">
-                            View Project
+                      <CardFooter>
+                        <Link href={`/team/${member.slug}`} className="w-full">
+                          <Button variant="outline" size="sm" className="w-full">
+                            View Profile
                           </Button>
                         </Link>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+             <TabsContent value="milestones" className="mt-6">
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold">Project Milestones</h2>
+                <p className="text-slate-700 dark:text-slate-300">
+                  Key milestones and progress for the {project.title} project.
+                </p>
+                <div className="space-y-4">
+                  {project.milestones.map((milestone, index) => (
+                    <Card key={index}>
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <CardTitle className="text-lg">{milestone.title}</CardTitle>
+                          <Badge className={getStatusColor(milestone.status)} variant="outline">
+                            {milestone.status}
+                          </Badge>
+                        </div>
+                        <CardDescription className="flex items-center">
+                          <Calendar className="mr-1 h-3 w-3" />
+                          {milestone.date}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pb-2">
+                        <p className="text-sm text-slate-700 dark:text-slate-300">{milestone.description}</p>
+                        <div className="mt-2">
+                          <div className="flex justify-between text-xs mb-1">
+                            <span>{milestone.completion}% Complete</span>
+                          </div>
+                          <Progress value={milestone.completion} className="h-1" />
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -301,34 +350,29 @@ export default function OntologyPage({ params }: OntologyPageProps) {
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold">Related Resources</h2>
                 <p className="text-slate-700 dark:text-slate-300">
-                  Articles, tutorials, and other resources related to the {ontology.title}
+                  Articles, tutorials, and other resources related to the {project.title} project.
                 </p>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {ontology.relatedResources.map((resource, index) => (
+                  {project.relatedResources.map((resource, index) => (
                     <Card key={index}>
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start">
                           <CardTitle className="text-lg">{resource.title}</CardTitle>
                           {resource.type === "tutorial" ? (
-                            <Badge
-                              variant="outline"
-                              className="bg-purple-100 text-purple-800 hover:bg-purple-200 dark:bg-purple-800/20 dark:text-purple-400"
-                            >
+                            <Badge variant="outline" className="bg-purple-100 text-purple-800 hover:bg-purple-200 dark:bg-purple-800/20 dark:text-purple-400">
                               Tutorial
                             </Badge>
                           ) : (
-                            <Badge
-                              variant="outline"
-                              className="bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400"
-                            >
+                            <Badge variant="outline" className="bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400">
                               Article
                             </Badge>
                           )}
                         </div>
                       </CardHeader>
-                      <CardContent>
+                      <CardFooter>
                         <Link
                           href={`/resources/${resource.type === "tutorial" ? "tutorials" : "articles"}/${resource.slug}`}
+                          className="w-full"
                         >
                           <Button variant="outline" className="w-full">
                             {resource.type === "tutorial" ? (
@@ -339,7 +383,7 @@ export default function OntologyPage({ params }: OntologyPageProps) {
                             Read {resource.type === "tutorial" ? "Tutorial" : "Article"}
                           </Button>
                         </Link>
-                      </CardContent>
+                      </CardFooter>
                     </Card>
                   ))}
                 </div>
@@ -353,21 +397,22 @@ export default function OntologyPage({ params }: OntologyPageProps) {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Need Help?</h2>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Interested in This Project?</h2>
               <p className="max-w-[700px] text-slate-700 dark:text-slate-300 md:text-xl/relaxed">
-                Contact our ontology experts for guidance on using the {ontology.title}.
+                Contact the project team for more information or to discuss potential collaboration.
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Link href="/team">
+              <Link href={`/team/${project.teamMembers[0]?.slug || 'team'}`}> {/* Fallback if teamMembers[0] is undefined */}
                 <Button className="px-8">
                   <Users className="mr-2 h-4 w-4" />
-                  Contact Domain Experts
+                  Contact Project Lead
                 </Button>
               </Link>
-              <Link href="/contact">
+              <Link href="/projects">
                 <Button variant="outline" className="px-8">
-                  Request Support
+                  <Activity className="mr-2 h-4 w-4" />
+                  View Other Projects
                 </Button>
               </Link>
             </div>
