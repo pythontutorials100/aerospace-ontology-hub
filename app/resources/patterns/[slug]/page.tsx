@@ -1,103 +1,120 @@
+// app/resources/patterns/[[slug]]/page.tsx
+
 import Link from "next/link"
-import { ArrowLeft, FileText, BookOpen } from "lucide-react"
+import { ArrowLeft, FileText, BookOpen } from "lucide-react" // Added Puzzle, ArrowRight if needed from PatternCard
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-interface PatternPageProps {
-  params: {
-    slug: string
-  }
-}
-
-export default function PatternPage({ params }: PatternPageProps) {
-  // In a real application, this would fetch data from your Strapi CMS
-  // For this example, we'll use hardcoded data
-  const pattern = {
+// --- Data for Modeling Patterns ---
+// IMPORTANT: Populate this array with ALL your modeling pattern details.
+const allPatternsData = [
+  {
+    slug: "component-assembly", // This must match the slug in your links and URLs
     title: "Component Assembly Pattern",
     description: "Pattern for modeling hierarchical assemblies of components.",
     longDescription:
       "The Component Assembly Pattern provides a standardized approach for modeling hierarchical assemblies of components in aerospace systems. It defines the relationships between assemblies, sub-assemblies, and individual components, enabling consistent representation of complex structures.",
     category: "Structural",
-    complexity: "Medium",
+    complexity: "Medium", // Use string values as in your PatternCard
     applicability: [
       "Use when modeling complex assemblies with multiple levels of hierarchy",
       "Appropriate for representing physical structures with part-whole relationships",
       "Useful for systems that need to track component relationships for maintenance or analysis",
     ],
-    structure: `# OWL Representation
-@prefix aco: <https://example.com/ontologies/aerospace-components#> .
-
-aco:Assembly rdfs:subClassOf aco:Component ;
-  rdfs:comment "A component that consists of other components" .
-
-aco:hasComponent rdf:type owl:ObjectProperty ;
-  rdfs:domain aco:Assembly ;
-  rdfs:range aco:Component ;
-  rdfs:comment "Relates an assembly to its components" .
-
-aco:isComponentOf rdf:type owl:ObjectProperty ;
-  owl:inverseOf aco:hasComponent ;
-  rdfs:domain aco:Component ;
-  rdfs:range aco:Assembly ;
-  rdfs:comment "Relates a component to its parent assembly" .`,
+    structure: `# OWL Representation...`, // Keep your structure example
     consequences: [
       "Enables representation of complex hierarchical structures",
-      "Supports queries for component containment and traversal",
-      "May require additional properties to represent specific assembly constraints",
-      "Can lead to deep hierarchies that require specialized visualization",
+      // ... more consequences
     ],
     relatedPatterns: [
       { name: "Material Properties Pattern", slug: "material-properties" },
       { name: "System Interfaces Pattern", slug: "system-interfaces" },
     ],
     relatedResources: [
-      {
-        type: "article",
-        title: "Ontology Design Patterns for Aerospace Engineering",
-        slug: "ontology-design-patterns-aerospace",
-      },
-      {
-        type: "tutorial",
-        title: "Implementing Component Hierarchies in OWL",
-        slug: "component-hierarchies-owl",
-      },
+      { type: "article", title: "Ontology Design Patterns for Aerospace Engineering", slug: "ontology-design-patterns-aerospace" },
+      { type: "tutorial", title: "Implementing Component Hierarchies in OWL", slug: "component-hierarchies-owl" },
     ],
     examples: [
-      {
-        title: "Wing Assembly Example",
-        description: "Example of modeling a wing assembly using the Component Assembly Pattern",
-        code: `# Example in Turtle format
-@prefix aco: <https://example.com/ontologies/aerospace-components#> .
-@prefix ex: <https://example.com/instances/> .
-
-ex:WingAssembly a aco:Assembly ;
-  aco:hasDesignation "Main Wing Assembly" ;
-  aco:hasComponent ex:WingSpar ;
-  aco:hasComponent ex:WingRib01 ;
-  aco:hasComponent ex:WingRib02 ;
-  aco:hasComponent ex:WingSkin .
-
-ex:WingSpar a aco:Component ;
-  aco:hasDesignation "Wing Main Spar" ;
-  aco:isComponentOf ex:WingAssembly .`,
-      },
+      { title: "Wing Assembly Example", description: "Example of modeling a wing assembly...", code: `# Example in Turtle format...` },
     ],
+  },
+  {
+    slug: "material-properties",
+    title: "Material Properties Pattern",
+    description: "Pattern for representing material properties and their values.",
+    longDescription: "Details about material properties pattern...",
+    category: "Properties",
+    complexity: "Simple",
+    applicability: ["Applicability 1", "Applicability 2"],
+    structure: `# OWL Structure...`,
+    consequences: ["Consequence 1"],
+    relatedPatterns: [],
+    relatedResources: [],
+    examples: [],
+  },
+  {
+    slug: "system-interfaces",
+    title: "System Interfaces Pattern",
+    description: "Pattern for modeling interfaces between systems and components.",
+    longDescription: "Details about system interfaces pattern...",
+    category: "Systems",
+    complexity: "Complex",
+    applicability: [],
+    structure: ``,
+    consequences: [],
+    relatedPatterns: [],
+    relatedResources: [],
+    examples: [],
+  },
+  // ... ADD ALL OTHER MODELING PATTERNS HERE with their respective details ...
+  // From app/patterns/page.tsx, you also have:
+  // qualification, measurement, process-flow, requirements, fault-diagnosis, temporal-relations
+];
+
+// Function to generate static paths for Next.js build
+export async function generateStaticParams() {
+  return allPatternsData.map((pattern) => ({
+    slug: pattern.slug,
+  }));
+}
+
+// Helper function to find pattern data by slug
+function getPatternBySlug(slugParam: string | string[] | undefined) {
+  const slug = Array.isArray(slugParam) ? slugParam[0] : slugParam;
+  return allPatternsData.find((pattern) => pattern.slug === slug);
+}
+
+interface PatternPageProps {
+  params: {
+    slug?: string | string[] // Adjust based on if your folder is [slug] or [[slug]] or [[...slug]]
+  }
+}
+
+export default function PatternPage({ params }: PatternPageProps) {
+  const pattern = getPatternBySlug(params.slug);
+
+  if (!pattern) {
+    return (
+      <div className="container mx-auto py-12 text-center">
+        <h1 className="text-2xl font-bold">Pattern Not Found</h1>
+        <p>The requested pattern could not be found.</p>
+        <Link href="/resources/patterns">
+          <Button className="mt-4">Back to Modeling Patterns</Button>
+        </Link>
+      </div>
+    );
   }
 
   const getComplexityColor = (complexity: string) => {
     switch (complexity) {
-      case "Simple":
-        return "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800/20 dark:text-green-400"
-      case "Medium":
-        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-800/20 dark:text-yellow-400"
-      case "Complex":
-        return "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-800/20 dark:text-red-400"
-      default:
-        return "bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400"
+      case "Simple": return "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800/20 dark:text-green-400";
+      case "Medium": return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-800/20 dark:text-yellow-400";
+      case "Complex": return "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-800/20 dark:text-red-400";
+      default: return "bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400";
     }
-  }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -232,17 +249,11 @@ ex:WingSpar a aco:Component ;
                         <div className="flex justify-between items-start">
                           <CardTitle className="text-lg">{resource.title}</CardTitle>
                           {resource.type === "tutorial" ? (
-                            <Badge
-                              variant="outline"
-                              className="bg-purple-100 text-purple-800 hover:bg-purple-200 dark:bg-purple-800/20 dark:text-purple-400"
-                            >
+                            <Badge variant="outline" className="bg-purple-100 text-purple-800 hover:bg-purple-200 dark:bg-purple-800/20 dark:text-purple-400">
                               Tutorial
                             </Badge>
                           ) : (
-                            <Badge
-                              variant="outline"
-                              className="bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400"
-                            >
+                            <Badge variant="outline" className="bg-slate-100 text-slate-800 hover:bg-slate-200 dark:bg-slate-800/20 dark:text-slate-400">
                               Article
                             </Badge>
                           )}
